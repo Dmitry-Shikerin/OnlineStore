@@ -38,7 +38,7 @@ namespace ИнтернетМагазин
             Name = name;
         }
 
-        public string Name { get; private set; }
+        public string Name { get; }
     }
 
     interface IWarehouse
@@ -61,12 +61,14 @@ namespace ИнтернетМагазин
 
         public bool CheckAvailability(Good good, int quantity)
         {
-            if (_goods.TryGetValue(good, out int count))
+            if (_goods.TryGetValue(good, out int count) == false)
             {
-                if (count < quantity)
-                {
-                    return false;
-                }
+                return false;
+            }
+
+            if (count < quantity)
+            {
+                return false;
             }
 
             return true;
@@ -75,14 +77,16 @@ namespace ИнтернетМагазин
         public void Delete(Good good, int quantity)
         {
             if (CheckAvailability(good, quantity) == false)
+            {
                 throw new InvalidOperationException();
+            }
 
             _goods[good] -= quantity;
 
-            if (_goods[good] != 0)
-                return;
-
-            _goods.Remove(good);
+            if (_goods[good] == 0)
+            {
+                _goods.Remove(good);
+            }
         }
 
         public void Delive(Good good, int quantity)
@@ -100,9 +104,9 @@ namespace ИнтернетМагазин
 
     class Cart
     {
-        private Dictionary<Good, int> _goods = new Dictionary<Good, int>();
+        private readonly Dictionary<Good, int> _goods = new Dictionary<Good, int>();
 
-        private IWarehouse _warehouse;
+        private readonly IWarehouse _warehouse;
 
         public Cart(IWarehouse warehouse)
         {
@@ -120,7 +124,9 @@ namespace ИнтернетМагазин
         public void Add(Good good, int quantity)
         {
             if (_warehouse.CheckAvailability(good, quantity) == false)
+            {
                 throw new InvalidOperationException();
+            }
 
             if (_goods.ContainsKey(good) == false)
             {
@@ -145,7 +151,7 @@ namespace ИнтернетМагазин
 
     class Order
     {
-        private Dictionary<Good, int> _goods = new Dictionary<Good, int>();
+        private readonly Dictionary<Good, int> _goods = new Dictionary<Good, int>();
 
         public Order(Dictionary<Good, int> goods, string paylink)
         {
@@ -158,8 +164,7 @@ namespace ИнтернетМагазин
 
     class Shop
     {
-        private IWarehouse _warehouse;
-        private Cart _cart;
+        private readonly IWarehouse _warehouse;
 
         public Shop(IWarehouse warehouse)
         {
