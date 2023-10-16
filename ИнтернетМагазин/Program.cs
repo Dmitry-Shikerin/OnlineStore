@@ -49,7 +49,7 @@ namespace ИнтернетМагазин
 
     class Warehouse : IWarehouse
     {
-        private Dictionary<Good, int> _goods = new Dictionary<Good, int>();
+        private readonly Dictionary<Good, int> _goods = new Dictionary<Good, int>();
 
         public void Show()
         {
@@ -66,12 +66,7 @@ namespace ИнтернетМагазин
                 return false;
             }
 
-            if (count < quantity)
-            {
-                return false;
-            }
-
-            return true;
+            return count > quantity;
         }
 
         public void Delete(Good good, int quantity)
@@ -140,12 +135,16 @@ namespace ИнтернетМагазин
 
         public Order Order()
         {
-            foreach (KeyValuePair<Good, int> keyValuePair in _goods)
+            Dictionary<Good, int> goods = new Dictionary<Good, int>(_goods);
+
+            _goods.Clear();
+
+            foreach (KeyValuePair<Good, int> keyValuePair in goods)
             {
                 _warehouse.Delete(keyValuePair.Key, keyValuePair.Value);
             }
 
-            return new Order(_goods, "Ссылка для оплаты");
+            return new Order(goods, "Ссылка для оплаты");
         }
     }
 
