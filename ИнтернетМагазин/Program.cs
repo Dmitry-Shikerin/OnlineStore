@@ -61,6 +61,11 @@ namespace ИнтернетМагазин
 
         public bool CheckAvailability(Good good, int quantity)
         {
+            if (good == null)
+            {
+                throw new ArgumentNullException();
+            }
+
             if (_goods.TryGetValue(good, out int count) == false)
             {
                 return false;
